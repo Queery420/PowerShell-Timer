@@ -1,5 +1,5 @@
 # PowerShell-Timer v0.1
-> A simple timer for Windows PowerShell
+A simple timer for Windows PowerShell
 
 ## Initial Notes
 > - Timer works in-terminal.
