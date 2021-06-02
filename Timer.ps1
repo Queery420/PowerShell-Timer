@@ -17,19 +17,6 @@ $minutes = 30
 $endTime = $(get-date).AddMinutes($minutes)
 $endTimeStr = $endTime.ToShortTimeString()
 
-# Display start & end time
-clear-host
-write-host "     Start:   $startTimeStr"
-write-host "     End:     $endTimeStr"
-write-host "     $minutes minutes remaining."
-
-# wait 1 minute
-Start-Sleep -s 60
-
-# Update currentTime and check to see if the timer is finished.
-$currentTime = $(get-date)
-$currentTimeStr = $currentTime.ToShortTimeString()
-$minutes = $minutes - 1
 
 # Core Loop. Updates every 60 seconds,
 While ($currentTime -le $endTime)
