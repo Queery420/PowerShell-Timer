@@ -4,7 +4,7 @@
 # Plays a sound and pushes a notification when the time is up.
 
 # Windows 10 Notification support
-Import-Module BurntToast
+import-module BurntToast
 
 # startTime is the time the script is initialized
 $startTime = $(get-date)
@@ -46,5 +46,6 @@ While ($currentTime -le $endTime)
 
 # Final time announcement, push notification
 clear-host
+write-host "Time's up!"
 write-host "The time is now $currentTimeStr."
-New-BurntToastNotification -Text "PowerShell Timer","The time is now $currentTimeStr."
+New-BurntToastNotification -Text "PowerShell Timer", "Time's up!" -sound "Call3"
