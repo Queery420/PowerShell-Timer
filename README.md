@@ -23,7 +23,7 @@ You may also customize any of the Parameters like so:
 ## v0.3 Notes
 - Timer works in-terminal.
 - Default time is 30 minutes for the first timer, 0 for the second, for 1 cycle (30 minutes total).
-- IFTTT Integration is on by default - you must comment out the code yourself (lines 120 & 162) or enter your own Webhook info into lines 58 & 60
+- IFTTT Integration is on by default - you must comment out the code yourself (lines 134 & 182) or enter your own Webhook info into lines 61 & 63
 - No system sound support.
 
 ## v0.2 -> v0.3 Changelog
