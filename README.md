@@ -55,15 +55,15 @@ A {{Value1}} minute timer is now complete at {{OccurredAt}}.
 {{Value2}} minutes remain overall.
 ```
 
-To enable IFTTT support, your Event Name will need to be entered into line 58...
+To enable IFTTT support, your Event Name will need to be entered into line 61...
 ```ps1
 $YourEventName = "YOUR EVENT NAME HERE DELETE THIS OR THE SCRIPT WON'T WORK"
 ```
-...and your webhook key (From https://ifttt.com/maker_webhooks/settings) will need to be entered into line 60
+...and your webhook key (From https://ifttt.com/maker_webhooks/settings) will need to be entered into line 63
 ```ps1
 $YourKey = "YOUR KEY HERE PUT IT HERE DELETE THIS AND PUT IT IN OR THIS SCRIPT WON'T WORK"
 ```
-Alternatively, if you do not wish to use the WebHook integration, simply comment out lines 120 and 162, as below.
+Alternatively, if you do not wish to use the WebHook integration, simply comment out lines 134 and 181, as below.
 > Before:
 ```ps1
   $shutup = Send-IftttAppNotification -EventName $YourEventName -Key $YourKey -Value1 $timerA -Value2 $totalMinutes
