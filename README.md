@@ -3,6 +3,7 @@ A simple timer for Windows PowerShell by @queery420
 
 Requires PowerShell and BurntToast (see below)
 
+
 Parameters:
 
 > **-timerA**: Defaults to 30 minutes. This is the first timer of the two in a cycle.
@@ -15,29 +16,87 @@ To run PowerShell-Timer with its default parameters (one 30-minute timer), simpl
 ```PowerShell
 .\Timer.ps1
 ```
+The output should look like this:
+```
+     ::OVERALL::
+     Overall Start:   4:37 PM
+     Overall End:     5:07 PM
+     30 of 30 minutes remaining overall.
+
+     ::TIMER::
+     Timer Start:     4:37 PM
+     Timer End:       5:07 PM
+     30 of 30 minutes remaining this timer.
+
+     Now:             4:37 PM
+```
+
 You may also customize any of the Parameters like so:
 ```PowerShell
 .\Timer.ps1 -timerA 60 -timerB 30 -timerCycles 3 
 ```
 The output should look like this:
 ```
-     Timer Start:   9:57 PM
-     Timer End:     2:27 AM
-     
-     Cycle Start:   9:57 PM
-     Cycle End:     10:57 PM
-     
-     Now:           9:57 PM
-     60 minutes remaining in this 60 minute cycle.
-     270 of 270 minutes remaining overall.
+     ::OVERALL::
+     Overall Start:   3:37 PM
+     Overall End:     8:07 PM
+     04:30 of 04:30 remaining overall.
+
+     ::CYCLE::
+     Cycle 1 of 3
+     Cycle Start:     3:37 PM
+     Cycle End:       5:07 PM
+     01:30 of 01:30 remaining this cycle.
+
+     ::TIMER::
+     Timer Start:     3:37 PM
+     Timer End:       4:37 PM
+     60 of 60 minutes remaining this timer.
+
+     Now:             3:37 PM
+```
+Another example:
+```PowerShell
+.\Timer.ps1 -timerA 3 -timerB 2 -timerCycles 2
+```
+Which outputs:
+```
+     ::OVERALL::
+     Overall Start:   3:32 PM
+     Overall End:     3:42 PM
+     10 of 10 minutes remaining overall.
+
+     ::CYCLE::
+     Cycle 1 of 2
+     Cycle Start:     3:32 PM
+     Cycle End:       3:37 PM
+     5 of 5 minutes remaining this cycle.
+
+     ::TIMER::
+     Timer Start:     3:32 PM
+     Timer End:       3:35 PM
+     3 of 3 minutes remaining this timer.
+
+     Now:             3:32 PM
 ```
 
+Exit the script at any time with ctrl + c.
 
-## v0.3 Notes
+
+## v0.4 Notes
 - Timer works in-terminal.
 - Default time is 30 minutes for the first timer, 0 for the second, for 1 cycle (30 minutes total).
-- IFTTT Integration is on by default - you must comment out the code yourself (lines 134 & 182) or enter your own Webhook info into lines 61 & 63. Otherwise it'll throw errors at you when it's notification time one way or the other (see IFTTT Support below for more information).
+- IFTTT Integration is off by default - you must change a boolean variable as well as entering your EventName and Key (see IFTTT Support below for more information).
 - No system sound support.
+
+## v0.3 -> v0.4 Changelog
+- Changed IFTTT integration (see below for new procedures)
+  - Integration is now off by default
+  - Set integration flag, removed old "comment" system of integration
+  - Added a String for the Value1
+  - Changed old Value2 -> Value3, old Value1 -> Value2
+- Added more comments
+- Improved output format.
 
 ## v0.2 -> v0.3 Changelog
 - Added IFTTT integration (see below)
@@ -59,45 +118,37 @@ PowerShell-Timer requires the BurntToast module (https://github.com/Windos/Burnt
 
 
 ## IFTTT Support
-PowerShell-Timer comes with IFTTT WebHook Support. To use this support, you will need to set up a custom WebHook on IFTTT.
-When making your Event, the parameters used are only EventName, Value1 (length of the timer that just finished), and Value2 (total time remaining); Value3 is unused.
+PowerShell-Timer comes with IFTTT WebHook Support via a code snippet from Dennis Rye (see code for attribution). To use this support, you will need to set up a custom WebHook event on IFTTT.
+When making your Event, the parameters used are EventName, Value1 (string: "Your timer has finished!"), Value2 (length of the timer that just finished), and Value3 (total time remaining).
 
 Example of my notification message from IFTTT
 ```
 {{EventName}}
-A {{Value1}} minute timer is now complete at {{OccurredAt}}.
-{{Value2}} minutes remain overall.
+{{Value1}}
+The {{Value2}} minute timer completed at {{OccurredAt}}.
+{{Value3}} minutes remain overall.
 ```
 
-To enable IFTTT support, your Event Name will need to be entered into line 61...
-```ps1
-$YourEventName = "YOUR EVENT NAME HERE DELETE THIS OR THE SCRIPT WON'T WORK"
-```
-...and your webhook key (From https://ifttt.com/maker_webhooks/settings) will need to be entered into line 63
-```ps1
-$YourKey = "YOUR KEY HERE PUT IT HERE DELETE THIS AND PUT IT IN OR THIS SCRIPT WON'T WORK"
-```
-Alternatively, if you do not wish to use the WebHook integration, simply comment out lines 134 and 182, as below.
+To enable IFTTT support, first change $IFTTT to $true in line 67, as below:
 > Before:
 ```ps1
-  $shutup = Send-IftttAppNotification -EventName $YourEventName -Key $YourKey -Value1 $timerA -Value2 $totalMinutes
-```
-```ps1
-  $shutup = Send-IftttAppNotification -EventName $YourEventName -Key $YourKey -Value1 $timerB -Value2 $totalMinutes
+$IFTTT = $false
 ```
 > After:
-```ps1
-#  $shutup = Send-IftttAppNotification -EventName $YourEventName -Key $YourKey -Value1 $timerA -Value2 $totalMinutes
 ```
+$IFTTT = $true
+```
+You must also enter your Event Name into line 69...
 ```ps1
-#  $shutup = Send-IftttAppNotification -EventName $YourEventName -Key $YourKey -Value1 $timerB -Value2 $totalMinutes
+$YourEventName = "PUT YOUR EVENT NAME HERE AND DELETE THIS OR THE SCRIPT WON'T WORK"
+```
+...and your webhook key (From https://ifttt.com/maker_webhooks/settings) will need to be entered into line 71.
+```ps1
+$YourKey = "PUT YOUR KEY HERE AND DELETE THIS OR THIS SCRIPT WON'T WORK"
 ```
 
+
 ## Development Goals
-- convert totalMinutes and totalMinutesStr to Hours & Minutes format from Minutes (int) format in output (i.e. 270 minutes to 4 hours 30 minutes)
-- Make Custom Notification Sounds Work God Damn It
-- Flexible cycles: Number of Timers parameter, array of times, modify timer loop to handle variable time
-- verify attribution conventions; update as necessary
-- expand documentation (comment everything)
-- set IFTTT integration to fully off by default (add comment signs to lines 34 and 182)
+- v0.5 will be one nested loop that can alternate the cycle it processes as opposed to two loops in serial inside a loop
+- Final release when I figure out sound on Toast notifications.
 - demonstrate value to self; grow as a person by typing words in pretty colors for 8 hours straight
