@@ -1,10 +1,64 @@
 # Simple PowerShell Timer
+# Originally written by Ivy Slick (@queery420) 6/2/21
 #
 # Displays current time, end time, remaining time.
 # Plays a sound and pushes a notification when the time is up.
 
+
+
+#Parameters
+param(
+  [Parameter( Mandatory = $false,
+              HelpMessage = "First timer")]
+  [int]$timerA = 30,
+  [Parameter( Mandatory = $false,
+              HelpMessage = "Second timer")]
+  [int]$timerB = 0,
+  [Parameter( Mandatory = $false,
+              HelpMessage = "Number of Cycles")]
+  [int]$timerCycles = 1
+)
+
+
 # Windows 10 Notification support
 import-module BurntToast
+
+
+# IFTTT Notification support
+# Code by Dennis Rye, May 12, 2019
+# https://www.dennisrye.com/post/send-smartphone-notifications-powershell-ifttt/
+function Send-IftttAppNotification {
+    [cmdletbinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$EventName,
+
+        [Parameter(Mandatory)]
+        [string]$Key,
+
+        # The length of the timer that is finished
+        [string]$Value1,
+        # Total time remaining
+        [string]$Value2,
+        # Unused
+        [string]$Value3
+    )
+
+    $webhookUrl = "https://maker.ifttt.com/trigger/{0}/with/key/{1}" -f $EventName, $Key
+
+    $body = @{
+        value1 = $Value1
+        value2 = $Value2
+        value3 = $Value3
+    }
+
+    Invoke-RestMethod -Method Get -Uri $webhookUrl -Body $body
+}
+# Your Event Name
+$YourEventName = "YOUR EVEN NAME HERE DELETE THIS OR THE SCRIPT WON'T WORK"
+# Your Key from https://ifttt.com/maker_webhooks/settings
+$YourKey = "YOUR KEY HERE PUT IT HERE DELETE THIS AND PUT IT IN OR THIS SCRIPT WON'T WORK"
+
 
 # startTime is the time the script is initialized
 $startTime = $(get-date)
@@ -13,39 +67,108 @@ $startTimeStr = $startTime.ToShortTimeString()
 $currentTime = $(get-date)
 $currentTimeStr = $currentTime.ToShortTimeString()
 # endTime is when the timer will sound, 30 minutes by default
-$minutes = 30
-$endTime = $(get-date).AddMinutes($minutes)
+$totalMinutes = $TimerCycles * ($timerA + $timerB)
+$totalMinutesStr = $totalMinutes
+$endTime = $(get-date).AddMinutes($totalMinutes)
 $endTimeStr = $endTime.ToShortTimeString()
 
+$cycles = 1
 
-# Core Loop. Updates every 60 seconds,
-While ($currentTime -le $endTime)
+
+# Core Loop. Updates every 60 seconds.
+clear-host
+While ($cycles -le $timerCycles)
 {
-  # Displays start time, end time, current time, remaining minutes
-  clear-host
-  write-host "     Start:   $startTimeStr"
-  write-host "     End:     $endTimeStr"
-  write-host "     Now:     $currentTimeStr"
-  if($minutes -eq 1)
+
+  # Timer A
+  $minutesA = $timerA
+  $startTimeA = $(get-date)
+  $startTimeAStr = $startTimeA.ToShortTimeString()
+  $endTimeA = $(get-date).AddMinutes($minutesA)
+  $endTimeAStr = $endTimeA.ToShortTimeString()
+
+  While ($currentTime -le $endTimeA)
   {
-    write-host "     1 minute remaining."
-  }
-  else
-  {
-    write-host "     $minutes minutes remaining."
+
+    # Displays start time, end time, current time, remaining minutes
+    write-host "     Timer Start:   $startTimeStr"
+    write-host "     Timer End:     $endTimeStr"
+    write-host ""
+    write-host "     Cycle Start:   $startTimeAStr"
+    write-host "     Cycle End:     $endTimeAStr"
+    write-host ""
+    write-host "     Now:           $currentTimeStr"
+    if($minutesA -eq 1) {write-host "     1 minute remaining in this $timerA minute cycle."}
+    else {write-host "     $minutesA minutes remaining in this $timerA minute cycle."}
+    if($totalMinutes -eq 1) {write-host "     1 minute of $totalMinutesStr remaining overall."}
+    else {write-host "     $totalMinutes of $totalMinutesStr minutes remaining overall."}
+
+    # wait 1 minute
+    Start-Sleep -s 60
+
+    # Update currentTime and check to see if the timer is finished.
+    $currentTime = $(get-date)
+    $currentTimeStr = $currentTime.ToShortTimeString()
+    $minutesA = $minutesA - 1
+    $totalMinutes = $totalMinutes - 1
+    clear-host
+
   }
 
-  # wait 1 minute
-  Start-Sleep -s 60
+  write-host "     A $timerA minute timer has finished."
+  New-BurntToastNotification -Text "PowerShell Timer", "Time's up!" -sound "Call3"
+  $shutup = Send-IftttAppNotification -EventName $YourEventName -Key $YourKey -Value1 $timerA -Value2 $totalMinutes
 
-  # Update currentTime and check to see if the timer is finished.
-  $currentTime = $(get-date)
-  $currentTimeStr = $currentTime.ToShortTimeString()
-  $minutes = $minutes - 1
+
+  # Timer B
+  $minutesB = $timerB
+  $startTimeB = $(get-date)
+  $startTimeBStr = $startTimeB.ToShortTimeString()
+  $endTimeB = $(get-date).AddMinutes($minutesB)
+  $endTimeBStr = $endTimeB.ToShortTimeString()
+
+  While ($currentTime -le $endTimeB)
+  {
+
+    # Displays start time, end time, current time, remaining minutes
+    write-host "     Timer Start:   $startTimeStr"
+    write-host "     Timer End:     $endTimeStr"
+    write-host ""
+    write-host "     Cycle Start:   $startTimeBStr"
+    write-host "     Cycle End:     $endTimeBStr"
+    write-host ""
+    write-host "     Now:           $currentTimeStr"
+    if($minutesB -eq 1) {write-host "     1 minute remaining in this $timerB minute cycle."}
+    else {write-host "     $minutesB minutes remaining in this $timerB minute cycle."}
+    if($totalMinutes -eq 1) {write-host "     1 minute of $totalMinutesStr remaining overall."}
+    else {write-host "     $totalMinutes of $totalMinutesStr minutes remaining overall."}
+
+    # wait 1 minute
+    Start-Sleep -s 60
+
+    # Update currentTime and check to see if the timer is finished.
+    $currentTime = $(get-date)
+    $currentTimeStr = $currentTime.ToShortTimeString()
+    $minutesB = $minutesB - 1
+    $totalMinutes = $totalMinutes - 1
+    clear-host
+
+  }
+
+  if ($timerB -gt 0)
+  {
+    write-host "     A $timerB minute timer has finished."
+    New-BurntToastNotification -Text "PowerShell Timer", "Time's up!" -sound "Call3"
+    $shutup = Send-IftttAppNotification -EventName $YourEventName -Key $YourKey -Value1 $timerB -Value2 $totalMinutes
+  }
+
+
+  # Update Cycles
+  $cycles = $cycles + 1
+  write-host "     $cycles cycle(s) out of $timerCycles have completed."
+
 }
 
-# Final time announcement, push notification
-clear-host
-write-host "Time's up!"
-write-host "The time is now $currentTimeStr."
-New-BurntToastNotification -Text "PowerShell Timer", "Time's up!" -sound "Call3"
+# Final time announcement
+write-host "     Time's up! All Cycles completed."
+write-host "     The time is now $currentTimeStr."
