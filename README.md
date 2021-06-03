@@ -36,7 +36,7 @@ The output should look like this:
 ## v0.3 Notes
 - Timer works in-terminal.
 - Default time is 30 minutes for the first timer, 0 for the second, for 1 cycle (30 minutes total).
-- IFTTT Integration is on by default - you must comment out the code yourself (lines 134 & 182) or enter your own Webhook info into lines 61 & 63
+- IFTTT Integration is on by default - you must comment out the code yourself (lines 134 & 182) or enter your own Webhook info into lines 61 & 63. Otherwise it'll throw errors at you when it's notification time one way or the other (see IFTTT Support below for more information).
 - No system sound support.
 
 ## v0.2 -> v0.3 Changelog
@@ -94,7 +94,7 @@ Alternatively, if you do not wish to use the WebHook integration, simply comment
 ```
 
 ## Development Goals
-- convert totalMinutes and totalMinutesStr to Hours & Minutes format from Minutes (int) format in output
-- Make Custom Notification Sounds Work
+- convert totalMinutes and totalMinutesStr to Hours & Minutes format from Minutes (int) format in output (i.e. 270 minutes to 4 hours 30 minutes)
+- Make Custom Notification Sounds Work God Damn It
 - Flexible cycles: Number of Timers parameter, array of times, modify timer loop to handle variable time
-- demonstrate value to self
+- demonstrate value to self; grow as a person by typing words in pretty colors for 8 hours straight
