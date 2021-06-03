@@ -135,7 +135,7 @@ To enable IFTTT support, first change $IFTTT to $true in line 67, as below:
 $IFTTT = $false
 ```
 > After:
-```
+```ps1
 $IFTTT = $true
 ```
 You must also enter your Event Name into line 69...
