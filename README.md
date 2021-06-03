@@ -48,6 +48,13 @@ PowerShell-Timer requires the BurntToast module (https://github.com/Windos/Burnt
 PowerShell-Timer comes with IFTTT WebHook Support. To use this support, you will need to set up a custom WebHook on IFTTT.
 When making your Event, the parameters used are only EventName, Value1 (length of the timer that just finished), and Value2 (total time remaining); Value3 is unused.
 
+Example of my notification message from IFTTT
+```
+{{EventName}}
+A {{Value1}} minute timer is now complete at {{OccurredAt}}.
+{{Value2}} minutes remain overall.
+```
+
 To enable IFTTT support, your Event Name will need to be entered into line 58...
 ```ps1
 $YourEventName = "YOUR EVENT NAME HERE DELETE THIS OR THE SCRIPT WON'T WORK"
