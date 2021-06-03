@@ -92,3 +92,9 @@ Alternatively, if you do not wish to use the WebHook integration, simply comment
 ```ps1
 #  $shutup = Send-IftttAppNotification -EventName $YourEventName -Key $YourKey -Value1 $timerB -Value2 $totalMinutes
 ```
+
+## Development Goals
+- convert totalMinutes and totalMinutesStr to Hours & Minutes format from Minutes (int) format in output
+- Make Custom Notification Sounds Work
+- Flexible cycles: Number of Timers parameter, array of times, modify timer loop to handle variable time
+- demonstrate value to self
