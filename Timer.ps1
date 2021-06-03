@@ -1,5 +1,6 @@
 # Simple PowerShell Timer
 # Originally written by Ivy Slick (@queery420) 6/2/21
+# Adapted from @avredd's sitstand.sh
 #
 # Displays current time, end time, remaining time.
 # Plays a sound and pushes a notification when the time is up.
@@ -7,14 +8,17 @@
 
 
 
-#Parameters
+# Parameters
 param(
+  # Length in minutes of the first timer, 30 minutes by default.
   [Parameter( Mandatory = $false,
               HelpMessage = "First timer")]
   [int]$timerA = 30,
+  # Length in minutes of the second timer, turned off (0 minutes) by default
   [Parameter( Mandatory = $false,
               HelpMessage = "Second timer")]
   [int]$timerB = 0,
+  # Number of times you wish the timer(s) to repeat, no repetition by default
   [Parameter( Mandatory = $false,
               HelpMessage = "Number of Cycles")]
   [int]$timerCycles = 1
@@ -39,11 +43,11 @@ function Send-IftttAppNotification {
         [Parameter(Mandatory)]
         [string]$Key,
 
-        # The length of the timer that just finished
+        # A String stating your timer has finished
         [string]$Value1,
-        # Total time remaining
+        # The length of the timer that just finished
         [string]$Value2,
-        # Unused
+        # Total time remaining across all cycles
         [string]$Value3
     )
 
@@ -57,10 +61,15 @@ function Send-IftttAppNotification {
 
     Invoke-RestMethod -Method Get -Uri $webhookUrl -Body $body
 }
+# IFTTT INTEGRATION VARIABLES
+# These must be set in order to use the optional IFTTT feature
+# IFTTT integration flag. Set to $true in order to enable the integration
+$IFTTT = $false
 # Your Event Name
-$YourEventName = "YOUR EVENT NAME HERE DELETE THIS OR THE SCRIPT WON'T WORK"
+$YourEventName = "PUT YOUR EVENT NAME HERE AND DELETE THIS OR THE SCRIPT WON'T WORK"
 # Your Key from https://ifttt.com/maker_webhooks/settings
-$YourKey = "YOUR KEY HERE PUT IT HERE DELETE THIS AND PUT IT IN OR THIS SCRIPT WON'T WORK"
+$YourKey = "PUT YOUR KEY HERE AND DELETE THIS OR THIS SCRIPT WON'T WORK"
+$IFTTTmsg = "Your timer has finished!"
 
 
 
@@ -80,13 +89,13 @@ $totalMinutesStr = $totalMinutes
 $endTime = $(get-date).AddMinutes($totalMinutes)
 $endTimeStr = $endTime.ToShortTimeString()
 # current cycle
-$cycles = 1
+$cycle = 1
 
 
 
 # Core Loop. Updates every 60 seconds.
 clear-host
-While ($cycles -le $timerCycles)
+While ($cycle -le $timerCycles)
 {
 
   # Timer A
@@ -98,22 +107,92 @@ While ($cycles -le $timerCycles)
   # endTimeA is when the first timer ends
   $endTimeA = $(get-date).AddMinutes($minutesA)
   $endTimeAStr = $endTimeA.ToShortTimeString()
+  # endTimeB is when the second timer ends
+  $endMinutes = $timerA + $timerB
+  $endTimeB = $(get-date).AddMinutes($endMinutes)
+  $endTimeBStr = $endTimeB.ToShortTimeString()
+  if($endMinutes -gt 60)
+  {
+    $eM = $endMinutes
+    $eM = [timeSpan]::fromminutes($eM)
+    $eM = $eM.ToString("hh\:mm")
+  }
+  else {$eM = "$endMinutes minutes"}
 
   While ($currentTime -le $endTimeA)
   {
 
-    # Displays all info
-    write-host "     Timer Start:   $startTimeStr"
-    write-host "     Timer End:     $endTimeStr"
+    # Overall time display
+    write-host "     ::OVERALL::"
+    write-host "     Overall Start:   $startTimeStr"
+    write-host "     Overall End:     $endTimeStr"
+    # Formats total times over 1 hour
+    # tM = string for Total Minutes
+    $tM = $totalMinutes
+    if($totalMinutes -gt 60)
+    {
+      $tM = [timeSpan]::fromminutes($totalMinutes)
+      $tM = $tM.ToString("hh\:mm")
+    }
+    elseif ($totalMinutesStr -gt 60) {$tM = "$totalMinutes minutes"}
+    # tMs = string for totalMinutesStr. Why yes, I am aware of that thing, thank you.
+    $tMs = "$totalMinutesStr minutes"
+    if($totalMinutesStr -gt 60)
+    {
+      $tMs = [timeSpan]::fromminutes($totalMinutesStr)
+      $tMs = $tMs.ToString("hh\:mm")
+    }
+    #Totals Summary
+    # Displays 1 minute remaining at 1 minute; otherwise displays "minutes"
+    if($totalMinutes -eq 1) {write-host "     1 minute of $tMs remaining overall."}
+    else {write-host "     $tM of $tMs remaining overall."}
     write-host ""
-    write-host "     Cycle Start:   $startTimeAStr"
-    write-host "     Cycle End:     $endTimeAStr"
+
+    # Cycle Display (only if timerB is on)
+    if ($timerB -ge 1)
+    {
+      $cycleTime = $minutesA + $timerB
+      if($cycleTime -gt 60)
+      {
+        $cycleTime = [timeSpan]::fromminutes($cycleTime)
+        $cycleTime = $cycleTime.ToString("hh\:mm")
+      }
+      elseif ($endMinutes -gt 60)
+      {$cycleTime = "$cycleTime minutes"}
+
+      write-host "     ::CYCLE::"
+      write-host "     Cycle $cycle of $timerCycles"
+      write-host "     Cycle Start:     $startTimeAStr"
+      write-host "     Cycle End:       $endTimeBStr"
+      write-host "     $cycleTime of $eM remaining this cycle."
+      write-host ""
+    }
+
+    # Timer display
+    # Formatting for times over 60 minutes
+    if($minutesA -gt 60)
+    {
+      $mA = [timeSpan]::fromminutes($minutesA)
+      $mA = $mA.ToString("hh\:mm")
+    }
+    else {$mA = "$minutesA"}
+
+    if($timerA -gt 60)
+    {
+      if($minutesA -le 60) {$mA = "$minutesA minutes"}
+      $tA = [timeSpan]::fromminutes($timerA)
+      $tA = $tA.ToString("hh\:mm")
+    }
+    elseif ($timerA -eq 1) {$tA = "1 minute"}
+    else {$tA = "$timerA minutes"}
+
+    write-host "     ::TIMER::"
+    write-host "     Timer Start:     $startTimeAStr"
+    write-host "     Timer End:       $endTimeAStr"
+    write-host "     $mA of $tA remaining this timer."
     write-host ""
-    write-host "     Now:           $currentTimeStr"
-    if($minutesA -eq 1) {write-host "     1 minute remaining in this $timerA minute cycle."}
-    else {write-host "     $minutesA minutes remaining in this $timerA minute cycle."}
-    if($totalMinutes -eq 1) {write-host "     1 minute of $totalMinutesStr remaining overall."}
-    else {write-host "     $totalMinutes of $totalMinutesStr minutes remaining overall."}
+    write-host "     Now:             $currentTimeStr"
+
 
     # wait 1 minute
     Start-Sleep -s 60
@@ -130,36 +209,92 @@ While ($cycles -le $timerCycles)
   # Timer A alarm & push notifications
   write-host "     A $timerA minute timer has finished."
   New-BurntToastNotification -Text "PowerShell Timer", "Time's up!" -sound "Call3"
-  # $shutup because if you leave it alone it outputs a statement.
-  $shutup = Send-IftttAppNotification -EventName $YourEventName -Key $YourKey -Value1 $timerA -Value2 $totalMinutes
-
-
+  #IFTTT notification
+  if ($IFTTT)
+  {
+    # $shutup because if you leave it alone it outputs a statement.
+    $shutup = Send-IftttAppNotification -EventName $YourEventName -Key $YourKey  -Value1 $IFTTTmsg -Value2 $timerA -Value3 $totalMinutes
+  }
 
   # Timer B
-  # minutesA is the local countdown for the first timerA
+  # minutesB is the local countdown for the second timer, timerB
   $minutesB = $timerB
-  # startTimeA is when the first time starts
+  # startTimeB is when the second timer starts
   $startTimeB = $(get-date)
   $startTimeBStr = $startTimeB.ToShortTimeString()
-  # endTimeB is when the first timer ends
+  # endTimeB is when the second timer ends
   $endTimeB = $(get-date).AddMinutes($minutesB)
   $endTimeBStr = $endTimeB.ToShortTimeString()
 
   While ($currentTime -le $endTimeB)
   {
 
-    # Displays all info
-    write-host "     Timer Start:   $startTimeStr"
-    write-host "     Timer End:     $endTimeStr"
+    # Overall time display
+    write-host "     ::OVERALL::"
+    write-host "     Overall Start:   $startTimeStr"
+    write-host "     Overall End:     $endTimeStr"
+    # Formats total times over 1 hour
+    # tM = string for Total Minutes
+    $tM = $totalMinutes
+    if($totalMinutes -gt 60)
+    {
+      $tM = [timeSpan]::fromminutes($totalMinutes)
+      $tM = $tM.ToString("hh\:mm")
+    }
+    elseif ($totalMinutesStr -gt 60) {$tM = "$totalMinutes minutes"}
+    # tMs = string for totalMinutesStr. Why yes, I am aware of that thing, thank you.
+    $tMs = "$totalMinutesStr minutes"
+    if($totalMinutesStr -gt 60)
+    {
+      $tMs = [timeSpan]::fromminutes($totalMinutesStr)
+      $tMs = $tMs.ToString("hh\:mm")
+    }
+    #Totals Summary
+    # Displays 1 minute remaining at 1 minute; otherwise displays "minutes"
+    if($totalMinutes -eq 1) {write-host "     1 minute of $tMs remaining overall."}
+    else {write-host "     $tM of $tMs remaining overall."}
     write-host ""
-    write-host "     Cycle Start:   $startTimeBStr"
-    write-host "     Cycle End:     $endTimeBStr"
+
+    # Cycle Display
+    $cycleTime = $minutesB
+    if($minutesB -gt 60)
+    {
+      $cycleTime = [timeSpan]::fromminutes($minutesB)
+      $cycleTime = $cycleTime.ToString("hh\:mm")
+    }
+    else {$cycleTime = "$cycleTime minutes"}
+
+    write-host "     ::CYCLE::"
+    write-host "     Cycle $cycle of $timerCycles"
+    write-host "     Cycle Start:     $startTimeAStr"
+    write-host "     Cycle End:       $endTimeBStr"
+    write-host "     $cycleTime of $eM remaining this cycle."
     write-host ""
-    write-host "     Now:           $currentTimeStr"
-    if($minutesB -eq 1) {write-host "     1 minute remaining in this $timerB minute cycle."}
-    else {write-host "     $minutesB minutes remaining in this $timerB minute cycle."}
-    if($totalMinutes -eq 1) {write-host "     1 minute of $totalMinutesStr remaining overall."}
-    else {write-host "     $totalMinutes of $totalMinutesStr minutes remaining overall."}
+
+    # Timer Display
+    # Formatting for times over 60 minutes
+    if($minutesB -gt 60)
+    {
+      $mB = [timeSpan]::fromminutes($minutesB)
+      $mB = $mB.ToString("hh\:mm")
+    }
+    else {$mB = "$minutesB"}
+
+    if($timerB -gt 60)
+    {
+      if($minutesB -le 60) {$mB = "$minutesB minutes"}
+      $tB = [timeSpan]::fromminutes($timerB)
+      $tB = $tB.ToString("hh\:mm")
+    }
+    elseif ($timerB -eq 1) {$tB = "1 minute"}
+    else {$tB = "$timerB minutes"}
+
+    write-host "     ::TIMER::"
+    write-host "     Timer Start:     $startTimeBStr"
+    write-host "     Timer End:       $endTimeBStr"
+    write-host "     $mB of $tB remaining this timer."
+    write-host ""
+    write-host "     Now:             $currentTimeStr"
 
     # wait 1 minute
     Start-Sleep -s 60
@@ -172,23 +307,25 @@ While ($cycles -le $timerCycles)
     clear-host
 
   }
-  
+
   # Timer B alarm & push notifications. Does not execute for a 0 minute timer.
   if ($timerB -gt 0)
   {
     write-host "     A $timerB minute timer has finished."
     New-BurntToastNotification -Text "PowerShell Timer", "Time's up!" -sound "Call3"
-    # $shutup because if you leave it alone it outputs a statement.
-    $shutup = Send-IftttAppNotification -EventName $YourEventName -Key $YourKey -Value1 $timerB -Value2 $totalMinutes
+    #IFTTT notification
+    if ($IFTTT)
+    {
+      # $shutup because if you leave it alone it outputs a statement.
+      $shutup = Send-IftttAppNotification -EventName $YourEventName -Key $YourKey -Value1 $IFTTTmsg -Value2 $timerB -Value3 $totalMinutes
+    }
   }
 
 
   # Update Cycles
-  $cycles = $cycles + 1
-  write-host "     $cycles cycle(s) out of $timerCycles have completed."
-
+  write-host "     $cycle cycle(s) out of $timerCycles have completed."
+  $cycle = $cycle + 1
 }
 
 # Final time announcement
-write-host "     Time's up! All Cycles completed."
-write-host "     The time is now $currentTimeStr."
+write-host "     Time's up! All Cycles completed at $currentTimeStr."
