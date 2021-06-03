@@ -5,11 +5,11 @@ Requires PowerShell and BurntToast (see below)
 
 Parameters:
 
-**-timerA**: Defaults to 30 minutes. This is the first timer of the two in a cycle.
-
-**-timerB**: Defaults to 0 minutes. This is the second timer of the two in a cycle.
-
-**-timerCycles**: Defaults to 1 cycle. Number of times the timers are repeated.
+> **-timerA**: Defaults to 30 minutes. This is the first timer of the two in a cycle.
+>
+> **-timerB**: Defaults to 0 minutes. This is the second timer of the two in a cycle.
+>
+> **-timerCycles**: Defaults to 1 cycle. Number of times the timers are repeated.
 
 To run PowerShell-Timer with its default parameters (one 30-minute timer), simply run
 ```PowerShell
