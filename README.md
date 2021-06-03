@@ -19,6 +19,19 @@ You may also customize any of the Parameters like so:
 ```PowerShell
 .\Timer.ps1 -timerA 60 -timerB 30 -timerCycles 3 
 ```
+The output should look like this:
+```
+     Timer Start:   9:57 PM
+     Timer End:     2:27 AM
+     
+     Cycle Start:   9:57 PM
+     Cycle End:     10:57 PM
+     
+     Now:           9:57 PM
+     60 minutes remaining in this 60 minute cycle.
+     270 of 270 minutes remaining overall.
+```
+
 
 ## v0.3 Notes
 - Timer works in-terminal.
@@ -43,6 +56,7 @@ PowerShell-Timer requires the BurntToast module (https://github.com/Windos/Burnt
 ```PowerShell
   Install-Module -Name BurntToast
 ```
+
 
 ## IFTTT Support
 PowerShell-Timer comes with IFTTT WebHook Support. To use this support, you will need to set up a custom WebHook on IFTTT.
