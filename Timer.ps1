@@ -36,7 +36,7 @@ function Send-IftttAppNotification {
         [Parameter(Mandatory)]
         [string]$Key,
 
-        # The length of the timer that is finished
+        # The length of the timer that just finished
         [string]$Value1,
         # Total time remaining
         [string]$Value2,
@@ -55,7 +55,7 @@ function Send-IftttAppNotification {
     Invoke-RestMethod -Method Get -Uri $webhookUrl -Body $body
 }
 # Your Event Name
-$YourEventName = "YOUR EVEN NAME HERE DELETE THIS OR THE SCRIPT WON'T WORK"
+$YourEventName = "YOUR EVENT NAME HERE DELETE THIS OR THE SCRIPT WON'T WORK"
 # Your Key from https://ifttt.com/maker_webhooks/settings
 $YourKey = "YOUR KEY HERE PUT IT HERE DELETE THIS AND PUT IT IN OR THIS SCRIPT WON'T WORK"
 
