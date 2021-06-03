@@ -97,4 +97,7 @@ Alternatively, if you do not wish to use the WebHook integration, simply comment
 - convert totalMinutes and totalMinutesStr to Hours & Minutes format from Minutes (int) format in output (i.e. 270 minutes to 4 hours 30 minutes)
 - Make Custom Notification Sounds Work God Damn It
 - Flexible cycles: Number of Timers parameter, array of times, modify timer loop to handle variable time
+- verify attribution conventions; update as necessary
+- expand documentation (comment everything)
+- set IFTTT integration to fully off by default (add comment signs to lines 34 and 182)
 - demonstrate value to self; grow as a person by typing words in pretty colors for 8 hours straight
