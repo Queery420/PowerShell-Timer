@@ -38,7 +38,7 @@ You may also customize any of the Parameters like so:
 
 
 ## BurntToast
-PowerShell-Timer requires the BurntToast module (https://github.com/Windos/BurntToast) to be installed. Enter the following line into PowerShell, say Yes, and you're good to go.
+PowerShell-Timer requires the BurntToast module (https://github.com/Windos/BurntToast) to be installed. Enter the following line into PowerShell, say 'Yes,' and you're good to go.
 
 ```PowerShell
   Install-Module -Name BurntToast
