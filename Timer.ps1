@@ -226,7 +226,7 @@ While ($cycle -le $timerCycles)
   $endTimeB = $(get-date).AddMinutes($minutesB)
   $endTimeBStr = $endTimeB.ToShortTimeString()
 
-  While ($currentTime -le $endTimeB)
+  While ($($currentTime -le $endTimeB) -and ($timerB -gt 0))
   {
 
     # Overall time display
