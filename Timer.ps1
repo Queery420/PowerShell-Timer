@@ -172,6 +172,7 @@ While ($cycles -le $timerCycles)
     clear-host
 
   }
+  
   # Timer B alarm & push notifications. Does not execute for a 0 minute timer.
   if ($timerB -gt 0)
   {
