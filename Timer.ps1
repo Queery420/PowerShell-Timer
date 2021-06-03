@@ -6,6 +6,7 @@
 
 
 
+
 #Parameters
 param(
   [Parameter( Mandatory = $false,
@@ -20,8 +21,10 @@ param(
 )
 
 
+
 # Windows 10 Notification support
 import-module BurntToast
+
 
 
 # IFTTT Notification support
@@ -60,19 +63,25 @@ $YourEventName = "YOUR EVENT NAME HERE DELETE THIS OR THE SCRIPT WON'T WORK"
 $YourKey = "YOUR KEY HERE PUT IT HERE DELETE THIS AND PUT IT IN OR THIS SCRIPT WON'T WORK"
 
 
+
+# Initialize Variables
+# ***Str is the version of the variable for concatinating
+
 # startTime is the time the script is initialized
 $startTime = $(get-date)
 $startTimeStr = $startTime.ToShortTimeString()
 # currentTime is the variable to be updated with the current time
 $currentTime = $(get-date)
 $currentTimeStr = $currentTime.ToShortTimeString()
-# endTime is when the timer will sound, 30 minutes by default
+# totalMinutes is a countdown to the end of all cycles
 $totalMinutes = $TimerCycles * ($timerA + $timerB)
 $totalMinutesStr = $totalMinutes
+# endTime is when the final alarm will sound and the script will complete
 $endTime = $(get-date).AddMinutes($totalMinutes)
 $endTimeStr = $endTime.ToShortTimeString()
-
+# current cycle
 $cycles = 1
+
 
 
 # Core Loop. Updates every 60 seconds.
@@ -81,16 +90,19 @@ While ($cycles -le $timerCycles)
 {
 
   # Timer A
+  # minutesA is the local countdown for the first timerA
   $minutesA = $timerA
+  # startTimeA is when the first time starts
   $startTimeA = $(get-date)
   $startTimeAStr = $startTimeA.ToShortTimeString()
+  # endTimeA is when the first timer ends
   $endTimeA = $(get-date).AddMinutes($minutesA)
   $endTimeAStr = $endTimeA.ToShortTimeString()
 
   While ($currentTime -le $endTimeA)
   {
 
-    # Displays start time, end time, current time, remaining minutes
+    # Displays all info
     write-host "     Timer Start:   $startTimeStr"
     write-host "     Timer End:     $endTimeStr"
     write-host ""
@@ -115,22 +127,28 @@ While ($cycles -le $timerCycles)
 
   }
 
+  # Timer A alarm & push notifications
   write-host "     A $timerA minute timer has finished."
   New-BurntToastNotification -Text "PowerShell Timer", "Time's up!" -sound "Call3"
+  # $shutup because if you leave it alone it outputs a statement.
   $shutup = Send-IftttAppNotification -EventName $YourEventName -Key $YourKey -Value1 $timerA -Value2 $totalMinutes
 
 
+
   # Timer B
+  # minutesA is the local countdown for the first timerA
   $minutesB = $timerB
+  # startTimeA is when the first time starts
   $startTimeB = $(get-date)
   $startTimeBStr = $startTimeB.ToShortTimeString()
+  # endTimeB is when the first timer ends
   $endTimeB = $(get-date).AddMinutes($minutesB)
   $endTimeBStr = $endTimeB.ToShortTimeString()
 
   While ($currentTime -le $endTimeB)
   {
 
-    # Displays start time, end time, current time, remaining minutes
+    # Displays all info
     write-host "     Timer Start:   $startTimeStr"
     write-host "     Timer End:     $endTimeStr"
     write-host ""
@@ -154,11 +172,12 @@ While ($cycles -le $timerCycles)
     clear-host
 
   }
-
+  # Timer B alarm & push notifications. Does not execute for a 0 minute timer.
   if ($timerB -gt 0)
   {
     write-host "     A $timerB minute timer has finished."
     New-BurntToastNotification -Text "PowerShell Timer", "Time's up!" -sound "Call3"
+    # $shutup because if you leave it alone it outputs a statement.
     $shutup = Send-IftttAppNotification -EventName $YourEventName -Key $YourKey -Value1 $timerB -Value2 $totalMinutes
   }
 
