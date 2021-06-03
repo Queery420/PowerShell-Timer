@@ -63,7 +63,7 @@ $YourEventName = "YOUR EVENT NAME HERE DELETE THIS OR THE SCRIPT WON'T WORK"
 ```ps1
 $YourKey = "YOUR KEY HERE PUT IT HERE DELETE THIS AND PUT IT IN OR THIS SCRIPT WON'T WORK"
 ```
-Alternatively, if you do not wish to use the WebHook integration, simply comment out lines 134 and 181, as below.
+Alternatively, if you do not wish to use the WebHook integration, simply comment out lines 134 and 182, as below.
 > Before:
 ```ps1
   $shutup = Send-IftttAppNotification -EventName $YourEventName -Key $YourKey -Value1 $timerA -Value2 $totalMinutes
