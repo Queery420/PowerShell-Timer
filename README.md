@@ -1,4 +1,4 @@
-# PowerShell-Timer v0.3
+# PowerShell-Timer v0.4
 A simple timer for Windows PowerShell by @queery420
 
 Requires PowerShell and BurntToast (see below)
