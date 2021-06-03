@@ -3,6 +3,23 @@ A simple timer for Windows PowerShell by @queery420
 
 Requires PowerShell and BurntToast (see below)
 
+Parameters:
+> - -timerA
+Defaults to 30 minutes. This is the first timer of the two in a cycle.
+> - -timerB
+Defaults to 0 minutes. This is the second timer of the two in a cycle.
+> - -timerCycles
+Defaults to 1 cycle. Number of times the timers are repeated.
+
+To run PowerShell-Timer with its default parameters (one 30-minute timer), simply run
+```PowerShell
+.\Timer.ps1
+```
+You may also customize any of the Parameters like so:
+```PowerShell
+.\Timer.ps1 -timerA 60 -timerB 30 -timerCycles 3 
+```
+
 ## v0.3 Notes
 - Timer works in-terminal.
 - Default time is 30 minutes for the first timer, 0 for the second, for 1 cycle (30 minutes total).
